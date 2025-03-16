@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+
 	"time"
 
 	"net/http"
@@ -22,6 +23,18 @@ type User struct {
 	ID       uint   `gorm:"primaryKey"`
 	Username string `gorm:"unique/not null"`
 	Password string `gorm:"unique/not null"`
+}
+
+func parseToken(tokenString string) (*Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil
+	})
+
+	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+		return claims, nil
+	} else {
+		return nil, err
+	}
 }
 
 type Claims struct {
@@ -49,7 +62,7 @@ func main() {
 	r := gin.Default()
 	r.POST("/register", register)
 	r.POST("/login", login)
-	// r.GET("/users", getUsers)
+	r.GET("/profile", authMiddleware(), profile)
 	r.Run(":8080")
 }
 
@@ -113,4 +126,41 @@ func createToken(userID uint) string {
 
 	return tokenString
 
+}
+
+func authMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		tokenString := c.GetHeader("Authorization")
+		if tokenString == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			c.Abort()
+			return
+		}
+
+		claims, err := parseToken(tokenString)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+			c.Abort()
+			return
+		}
+
+		c.Set("userID", claims.UserID)
+		c.Next()
+	}
+}
+
+func profile(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	var user User
+	if err := db.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"user": user})
 }
