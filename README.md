@@ -18,12 +18,13 @@ DB_PASSWORD=password
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_NAME=yourdatabase
+SECRET_KEY=your_secret_key
 ```
 
 ## APIの使い方
 ### 1.ユーザー登録
-リクエスト
-POST /register
+**リクエスト**
+`POST /register`
 
 ```
 {
@@ -32,15 +33,15 @@ POST /register
 }
 ```
 
-レスポンス
+**レスポンス**
 ```
 {
     "message":"user created"
 }
 ```
 ### 2.ログイン
-リクエスト
-POST /login
+**リクエスト**
+`POST /login`
 
 ```
 {
@@ -48,7 +49,20 @@ POST /login
   "password": "password123"
 }
 ```
-レスポンス
+**レスポンス**
 {
     "token": "token..."
 }
+
+### 3. プロフィール取得（要認証）
+`GET /profile` （JWTトークンが必要）
+
+**ヘッダー**
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+**レスポンス**
+```
+{"ID":1,"Username":"testuser"}
+```
