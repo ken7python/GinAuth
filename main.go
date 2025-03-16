@@ -17,6 +17,7 @@ import (
 )
 
 var db *gorm.DB
+
 var secretKey = "your_secret_key"
 
 type User struct {
@@ -51,6 +52,8 @@ func main() {
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	dbName := os.Getenv("DB_NAME")
+	secretKey = os.Getenv("SECRET_KEY")
+	//println(secretKey)
 	dsn := user + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbName + "?charset=utf8mb4&parseTime=True&loc=Local"
 	//println(dsn)
 	database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
