@@ -21,6 +21,18 @@ DB_NAME=yourdatabase
 SECRET_KEY=your_secret_key
 ```
 
+## JWT Secret Key の生成
+JWTのSECRET_KEYをランダムに生成するスクリプトがあります。
+
+### 使い方
+```
+go run generate_secret.go
+```
+### .envに以下を追加
+```
+SECRET_KEY=生成されたキー
+```
+
 ## APIの使い方
 ### 1.ユーザー登録
 **リクエスト**
