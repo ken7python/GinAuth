@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"net/http"
 
@@ -24,7 +25,7 @@ type User struct {
 }
 
 type Claims struct {
-	UserID uint `json:"user_id`
+	UserID uint `json:"user_id"`
 	jwt.StandardClaims
 }
 
@@ -47,10 +48,8 @@ func main() {
 	db.AutoMigrate(&User{})
 	r := gin.Default()
 	r.POST("/register", register)
-	/*
-		r.POST("/login", login)
-		r.GET("/users", getUsers)
-	*/
+	r.POST("/login", login)
+	// r.GET("/users", getUsers)
 	r.Run(":8080")
 }
 
@@ -73,4 +72,45 @@ func register(c *gin.Context) {
 	db.Create(&User{Username: req.Username, Password: string(hashedPassword)})
 
 	c.JSON(http.StatusOK, gin.H{"message": "user created"})
+}
+
+func login(c *gin.Context) {
+	var req struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user User
+	if err := db.Where("username = ?", req.Username).First(&user).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid username or password"})
+		return
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid username or password"})
+		return
+	}
+
+	token := createToken(user.ID)
+	c.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+func createToken(userID uint) string {
+	claims := Claims{
+		UserID: userID,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, _ := token.SignedString([]byte(secretKey))
+
+	return tokenString
+
 }
