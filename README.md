@@ -33,6 +33,11 @@ go run generate_secret.go
 SECRET_KEY=生成されたキー
 ```
 
+## 実行方法
+```
+go run main.go database.go user.go
+```
+
 ## APIの使い方
 ### 1.ユーザー登録
 **リクエスト**
