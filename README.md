@@ -41,7 +41,7 @@ go run main.go database.go user.go
 ## APIの使い方
 ### 1.ユーザー登録
 **リクエスト**
-`POST /register`
+`POST api/register`
 
 ```
 {
@@ -58,7 +58,7 @@ go run main.go database.go user.go
 ```
 ### 2.ログイン
 **リクエスト**
-`POST /login`
+`POST api/login`
 
 ```
 {
@@ -72,7 +72,7 @@ go run main.go database.go user.go
 }
 
 ### 3. プロフィール取得（要認証）
-`GET /profile` （JWTトークンが必要）
+`GET api/profile` （JWTトークンが必要）
 
 **ヘッダー**
 ```
