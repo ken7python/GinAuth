@@ -8,15 +8,19 @@ async function profile(){
         });
         const data = await response.json();
         console.log(data);
-        return data;
+        if (response.ok) {
+            return data;
+        }else{
+            directToLogin();
+        }
     } catch (error) {
         console.error('ユーザー情報の取得に失敗しました:', error);
-        window.location.href = '/login';
+        directToLogin();
     }
 }
 function logout() {
     localStorage.removeItem('token');
-    window.location.href = '/login';
+    directToLogin();
 }
 
 async function login(username, password) {
@@ -63,4 +67,8 @@ async function register(username, password) {
         console.error(error_message);
         return {"ok":false, "error":error_message};
     }
+}
+
+function directToLogin(){
+    window.location.href = '/login';
 }

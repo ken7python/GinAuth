@@ -6,14 +6,18 @@ import (
 	"strings"
 	"time"
 
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
 	ID       uint   `gorm:"primaryKey"`
+	UUID     string `gorm:"unique/not null"`
 	Username string `gorm:"unique/not null"`
 	Password string `gorm:"unique/not null"`
 }
@@ -67,8 +71,14 @@ func register(c *gin.Context) {
 		c.JSON(http.StatusConflict, gin.H{"error": "ユーザー名は既に使用されています"})
 		return
 	}
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "UUIDの生成に失敗しました"})
+		return
+	}
+	fmt.Printf("uuid: %s\n", uuid.String())
 
-	db.Create(&User{Username: req.Username, Password: string(hashedPassword)})
+	db.Create(&User{Username: req.Username, Password: string(hashedPassword), UUID: uuid.String()})
 
 	c.JSON(http.StatusOK, gin.H{"message": "ユーザーを作成しました"})
 }
