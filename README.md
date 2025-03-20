@@ -26,6 +26,7 @@ JWTのSECRET_KEYをランダムに生成するスクリプトがあります。
 
 ### 使い方
 ```
+cd tools
 go run generate_secret.go
 ```
 ### .envに以下を追加
