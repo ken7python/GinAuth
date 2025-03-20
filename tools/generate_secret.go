@@ -9,13 +9,21 @@ import (
 const secretLength = 32
 
 func main() {
+	encodedSecret := generate_secret()
+	if encodedSecret == "" {
+		return
+	}
+	fmt.Println(encodedSecret)
+}
+
+func generate_secret() string {
 	secret := make([]byte, secretLength)
 	_, err := rand.Read(secret)
 	if err != nil {
 		fmt.Println("エラー: 秘密鍵を生成できませんでした")
-		return
+		return ""
 	}
 
 	encodedSecret := base64.StdEncoding.EncodeToString(secret)
-	fmt.Println(encodedSecret)
+	return encodedSecret
 }

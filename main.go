@@ -27,7 +27,7 @@ func rateLimitMiddleware() gin.HandlerFunc {
 }
 
 func main() {
-	InitDB()
+	InitDB_MySQL()
 	r := gin.Default()
 
 	r.Static("/static", "./static")

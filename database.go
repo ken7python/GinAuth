@@ -6,12 +6,19 @@ import (
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
 var db *gorm.DB
 
-func InitDB() {
+func Migrate(database *gorm.DB) {
+	db = database
+	db.AutoMigrate(&User{})
+	log.Println("✅ データベース接続成功")
+}
+
+func InitDB_MySQL() {
 	if err := godotenv.Load(); err != nil {
 		panic("Error loading .env file")
 	}
@@ -27,8 +34,14 @@ func InitDB() {
 	if err != nil {
 		panic("failed to connect database")
 	}
-	db = database
-	db.AutoMigrate(&User{})
+	Migrate(database)
 
-	log.Println("✅ データベース接続成功")
+}
+
+func InitDB_SQLite() {
+	database, err := gorm.Open(sqlite.Open("data.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+	Migrate(database)
 }

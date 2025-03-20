@@ -6,6 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"crypto/rand"
+	"encoding/base64"
+
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -22,11 +25,37 @@ type User struct {
 	Password string `gorm:"unique/not null"`
 }
 
-func GetSecretKey() string {
-	if err := godotenv.Load(); err != nil {
-		panic("Error loading .env file")
+var secretKey string
+
+func generate_secret() string {
+	const secretLength = 32
+	secret := make([]byte, secretLength)
+	_, err := rand.Read(secret)
+	if err != nil {
+		fmt.Println("エラー: 秘密鍵を生成できませんでした")
+		return ""
 	}
-	return os.Getenv("SECRET_KEY")
+
+	encodedSecret := base64.StdEncoding.EncodeToString(secret)
+	return encodedSecret
+}
+
+func GetSecretKey() string {
+	if secretKey != "" {
+		return secretKey
+	}
+
+	if err := godotenv.Load(); err == nil {
+		secretKey = os.Getenv("SECRET_KEY")
+	}
+
+	if secretKey == "" {
+		secretKey = generate_secret()
+		if secretKey == "" {
+			panic("Error: Failed to generate a secret key")
+		}
+	}
+	return secretKey
 }
 
 func parseToken(tokenString string) (*Claims, error) {
