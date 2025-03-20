@@ -50,5 +50,5 @@ func main() {
 	accounts.POST("/login", login)
 	accounts.GET("/profile", authMiddleware(), profile)
 
-	r.Run(":8080")
+	r.Run("0.0.0.0:8080")
 }
