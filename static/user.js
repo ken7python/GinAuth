@@ -1,7 +1,7 @@
 async function profile(){
     const token = localStorage.getItem('token')
     try {
-        const response = await fetch('/api/profile', {
+        const response = await fetch(account_url + "/profile", {
             headers: {
                 Authorization: `Bearer ${token}`
             }
@@ -24,7 +24,7 @@ function logout() {
 }
 
 async function login(username, password) {
-    const response = await fetch('/api/login', {
+    const response = await fetch(account_url + "/login", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ async function login(username, password) {
 
 async function register(username, password) {
     var error_message;
-    const response = await fetch('api/register', {
+    const response = await fetch(account_url + "/register", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

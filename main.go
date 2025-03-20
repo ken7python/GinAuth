@@ -45,9 +45,10 @@ func main() {
 	api := r.Group("/api")
 	api.Use(rateLimitMiddleware())
 
-	api.POST("/register", register)
-	api.POST("/login", login)
-	api.GET("/profile", authMiddleware(), profile)
+	accounts := api.Group("/accounts")
+	accounts.POST("/register", register)
+	accounts.POST("/login", login)
+	accounts.GET("/profile", authMiddleware(), profile)
 
 	r.Run(":8080")
 }
