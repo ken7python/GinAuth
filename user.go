@@ -50,7 +50,7 @@ type Claims struct {
 func register(c *gin.Context) {
 	println("/register")
 	var req struct {
-		Username string `json:"username""`
+		Username string `json:"username"`
 		Password string `json:"password"`
 	}
 
@@ -135,10 +135,8 @@ func authMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		// "Bearer " プレフィックスがある場合は削除
-		if strings.HasPrefix(tokenString, "Bearer ") {
-			tokenString = tokenString[7:]
-		}
+		// Remove "Bearer " prefix if present
+		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
 
 		claims, err := parseToken(tokenString)
 		if err != nil {
