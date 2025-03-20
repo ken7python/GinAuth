@@ -42,8 +42,12 @@ func main() {
 		c.File("templates/login.html")
 	})
 
-	r.POST("api/register", rateLimitMiddleware(), register)
-	r.POST("api/login", rateLimitMiddleware(), login)
-	r.GET("api/profile", authMiddleware(), rateLimitMiddleware(), profile)
+	api := r.Group("/api")
+	api.Use(rateLimitMiddleware())
+
+	api.POST("/register", register)
+	api.POST("/login", login)
+	api.GET("/profile", authMiddleware(), profile)
+
 	r.Run(":8080")
 }
